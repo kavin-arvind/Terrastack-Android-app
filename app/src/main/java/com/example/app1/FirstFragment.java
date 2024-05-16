@@ -10,10 +10,17 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.app1.databinding.FragmentFirstBinding;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-public class FirstFragment extends Fragment {
+public class FirstFragment extends Fragment implements OnMapReadyCallback {
 
     private FragmentFirstBinding binding;
+    private GoogleMap googleMap;
 
     @Override
     public View onCreateView(
@@ -33,6 +40,10 @@ public class FirstFragment extends Fragment {
                 NavHostFragment.findNavController(FirstFragment.this)
                         .navigate(R.id.action_FirstFragment_to_SecondFragment)
         );
+
+        // Obtain a reference to the SupportMapFragment
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -41,4 +52,13 @@ public class FirstFragment extends Fragment {
         binding = null;
     }
 
+    @Override
+    public void onMapReady(@NonNull GoogleMap map) {
+        googleMap = map;
+
+        // Add a marker in the center of the map and move the camera
+        LatLng markerPosition = new LatLng(0, 0); // Change the coordinates as needed
+        googleMap.addMarker(new MarkerOptions().position(markerPosition).title("Marker"));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(markerPosition));
+    }
 }
