@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <EditText
+    <TextView
         android:id="@+id/editTextText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -19,14 +19,14 @@
         android:padding="30dp"
         android:layout_gravity="center" />
 
-    <TextView
+    <!-- <TextView
         android:id="@+id/textview_first"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/lorem_ipsum"
         android:layout_marginTop="16dp"
         android:padding="16dp"
-        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vehicula magna sit amet augue lacinia, id faucibus lacus feugiat. Proin vitae pretium nunc, at tincidunt purus. Nulla tincidunt malesuada dolor, nec egestas ligula porttitor at." />
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vehicula magna sit amet augue lacinia, id faucibus lacus feugiat. Proin vitae pretium nunc, at tincidunt purus. Nulla tincidunt malesuada dolor, nec egestas ligula porttitor at." /> -->
 
     <fragment
         android:id="@+id/map"
