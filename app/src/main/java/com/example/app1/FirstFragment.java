@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -17,11 +18,20 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class FirstFragment extends Fragment implements OnMapReadyCallback {
 
     private FragmentFirstBinding binding;
     private GoogleMap googleMap;
-
+    TextView tv;
+    String url = "http://127.0.0.1:8000/";
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -44,6 +54,32 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         // Obtain a reference to the SupportMapFragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        tv = (TextView) view.findViewById(R.id.tv);
+        tv.setText("");
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(url)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        my_api api = retrofit.create(my_api.class);
+
+        Call<List<Plot>> call = api.getVillage();
+
+        call.enqueue(new Callback<List<Plot>>() {
+            @Override
+            public void onResponse(Call<List<Plot>> call, Response<List<Plot>> response) {
+                List<Plot> data = response.body();
+                for(int i = 0; i < data.size() ; i++)
+                    tv.append("gid - "+data.get(i).getGid() + " survey-no - " + data.get(i).getSurvey_no()+" \n\n\n");
+            }
+
+            @Override
+            public void onFailure(Call<List<Plot>> call, Throwable t) {
+
+            }
+        });
     }
 
     @Override
