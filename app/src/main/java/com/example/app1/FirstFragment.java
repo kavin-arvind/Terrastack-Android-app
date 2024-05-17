@@ -1,6 +1,7 @@
 package com.example.app1;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
 
 import java.util.List;
 
@@ -31,7 +33,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     private FragmentFirstBinding binding;
     private GoogleMap googleMap;
     TextView tv;
-    String url = "http://127.0.0.1:8000/";
+    String url = "https://www.jsonkeeper.com/";
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -56,7 +58,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
 
         tv = (TextView) view.findViewById(R.id.tv);
-        tv.setText("");
+        tv.setText("initial text\n");
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
@@ -70,16 +72,25 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         call.enqueue(new Callback<List<Plot>>() {
             @Override
             public void onResponse(Call<List<Plot>> call, Response<List<Plot>> response) {
-                List<Plot> data = response.body();
-                for(int i = 0; i < data.size() ; i++)
-                    tv.append("gid - "+data.get(i).getGid() + " survey-no - " + data.get(i).getSurvey_no()+" \n\n\n");
+                if (response.isSuccessful()) {
+                    // Response is successful
+                    List<Plot> data = response.body();
+                    for(int i = 0; i < data.size() ; i++)
+                        tv.append("gid - "+data.get(i).getGid() + " survey-no - " + data.get(i).getSurvey_no()+" \n\n\n");
+                    addPolygonsToMap(data);
+                } else {
+                    // Handle unsuccessful response
+                    Log.e("Retrofit", "Response not successful: " + response.message());
+                }
             }
 
             @Override
             public void onFailure(Call<List<Plot>> call, Throwable t) {
-
+                // Handle failure
+                Log.e("Retrofit", "Failed to fetch data: " + t.getMessage());
             }
         });
+
     }
 
     @Override
@@ -96,5 +107,22 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         LatLng markerPosition = new LatLng(0, 0); // Change the coordinates as needed
         googleMap.addMarker(new MarkerOptions().position(markerPosition).title("Marker"));
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(markerPosition));
+    }
+
+    private void addPolygonsToMap(List<Plot> data) {
+        for (Plot plot : data) {
+            List<LatLng> coordinates = plot.getCoordinates();
+            if (coordinates != null && !coordinates.isEmpty()) {
+                PolygonOptions polygonOptions = new PolygonOptions()
+                        .addAll(coordinates)
+                        .strokeColor(0xFF0000FF) // Outline color
+                        .fillColor(0x7F00FF00); // Fill color with transparency
+
+                googleMap.addPolygon(polygonOptions);
+            } else {
+                // Handle case where coordinates are null or empty if necessary
+                tv.append("Plot with gid " + plot.getCoordinates() + " has no coordinates\n");
+            }
+        }
     }
 }
