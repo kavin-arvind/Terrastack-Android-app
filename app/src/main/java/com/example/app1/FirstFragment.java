@@ -11,14 +11,23 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.example.app1.Plot;
+import com.example.app1.R;
 import com.example.app1.databinding.FragmentFirstBinding;
+import com.example.app1.my_api;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
+
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
 import java.util.List;
 
@@ -34,15 +43,14 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     TextView tv;
     String url = "https://www.jsonkeeper.com/";
+
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState
     ) {
-
         binding = FragmentFirstBinding.inflate(inflater, container, false);
         return binding.getRoot();
-
     }
 
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
@@ -75,9 +83,20 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                 if (response.isSuccessful()) {
                     // Response is successful
                     List<Plot> data = response.body();
-                    for(int i = 0; i < data.size() ; i++)
-                        tv.append("gid - "+data.get(i).getGid() + " survey-no - " + data.get(i).getSurvey_no()+" \n\n\n");
-                    addPolygonsToMap(data);
+                    for (int i = 0; i < data.size(); i++) {
+                        Plot plot = data.get(i);
+                        plot.setGeometry();
+                        tv.append("gid - " + plot.getGid() + " survey-no - " + plot.getSurvey_no() + "\n");
+                        if (plot.getGeometry() != null) {
+                            tv.append("not null\n\n");
+
+                            // Add polygon to map
+                            addPolygonToMap(plot.getGeometry());
+                        } else {
+                            tv.append("nullly \n\n");
+                        }
+                    }
+                    //moveCameraToPlots(data);
                 } else {
                     // Handle unsuccessful response
                     Log.e("Retrofit", "Response not successful: " + response.message());
@@ -109,20 +128,55 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(markerPosition));
     }
 
-    private void addPolygonsToMap(List<Plot> data) {
-        for (Plot plot : data) {
-            List<LatLng> coordinates = plot.getCoordinates();
-            if (coordinates != null && !coordinates.isEmpty()) {
-                PolygonOptions polygonOptions = new PolygonOptions()
-                        .addAll(coordinates)
-                        .strokeColor(0xFF0000FF) // Outline color
-                        .fillColor(0x7F00FF00); // Fill color with transparency
+    // Add polygon to map
+    private void addPolygonToMap(Geometry geometry) {
+        try {
+            // Convert JTS Geometry to Google Maps PolygonOptions
+            PolygonOptions polygonOptions = convertGeometryToPolygonOptions(geometry);
 
-                googleMap.addPolygon(polygonOptions);
-            } else {
-                // Handle case where coordinates are null or empty if necessary
-                tv.append("Plot with gid " + plot.getCoordinates() + " has no coordinates\n");
-            }
+            // Add Polygon to the map
+            googleMap.addPolygon(polygonOptions);
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
+
+    // Convert JTS Geometry to Google Maps PolygonOptions
+    private PolygonOptions convertGeometryToPolygonOptions(Geometry geometry) throws ParseException {
+        PolygonOptions polygonOptions = new PolygonOptions();
+
+        // Extract coordinates from JTS Geometry and add them to PolygonOptions
+        for (int i = 0; i < geometry.getCoordinates().length; i++) {
+            LatLng latLng = new LatLng(
+                    geometry.getCoordinates()[i].y,
+                    geometry.getCoordinates()[i].x
+            );
+            polygonOptions.add(latLng);
+        }
+
+        return polygonOptions;
+    }
+
+//    private void moveCameraToPlots(List<Plot> plotsList) {
+//        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+//
+//        for (Plot plot : plotsList) {
+//            if (plot.getGeometry() != null) {
+//                // Iterate through the coordinates of the plot and include them in the bounds
+//                for (LatLng latLng : plot.getGeometry().getCoordinates()) {
+//                    boundsBuilder.include(latLng);
+//                }
+//            }
+//        }
+//
+//        // Build the bounds
+//        LatLngBounds bounds = boundsBuilder.build();
+//
+//        // Set padding around the bounds (optional)
+//        int padding = 100; // Padding in pixels
+//        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+//
+//        // Move the camera to focus on the bounds
+//        googleMap.animateCamera(cameraUpdate);
+//    }
 }
