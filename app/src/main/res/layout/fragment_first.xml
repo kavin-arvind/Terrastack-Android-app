@@ -8,48 +8,29 @@
     android:orientation="vertical" >
 
     <TextView
-        android:id="@+id/editTextText"
+        android:id="@+id/village_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
         android:textColor="#A020F0"
         android:inputType="text"
-        android:text="First fragment"
-        android:textSize="40dp"
-        android:padding="30dp"
+        android:text="Village name"
+        android:textSize="25dp"
+        android:padding="5dp"
         android:layout_gravity="center" />
-
-    <!-- <TextView
-        android:id="@+id/textview_first"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/lorem_ipsum"
-        android:layout_marginTop="16dp"
-        android:padding="16dp"
-        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis vehicula magna sit amet augue lacinia, id faucibus lacus feugiat. Proin vitae pretium nunc, at tincidunt purus. Nulla tincidunt malesuada dolor, nec egestas ligula porttitor at." /> -->
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="360dp"
+        android:layout_height="400dp"
         android:padding="10dp"
         android:layout_marginTop="16dp" />
-
-        <TextView 
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="#000000"
-        android:textSize="24sp"
-        android:id="@+id/tvhead"
-        android:text="Demo text heading"
-        android:layout_gravity="center" />
 
         <ScrollView
         android:id="@+id/scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10sp">
+            android:padding="5sp">
 
             <TextView
                 android:layout_width="match_parent"

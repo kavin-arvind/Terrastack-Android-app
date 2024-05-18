@@ -43,6 +43,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     private FragmentFirstBinding binding;
     private GoogleMap googleMap;
     TextView tv;
+    TextView village_name;
     String url = "https://www.jsonkeeper.com/";
 
     @Override
@@ -67,7 +68,8 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         mapFragment.getMapAsync(this);
 
         tv = (TextView) view.findViewById(R.id.tv);
-        tv.setText("initial text\n");
+        village_name = (TextView) view.findViewById(R.id.village_name);
+        tv.setText("");
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(url)
@@ -84,18 +86,12 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                 if (response.isSuccessful()) {
                     // Response is successful
                     List<Plot> data = response.body();
+                    village_name.setText("Dagdagad");
                     for (int i = 0; i < data.size(); i++) {
                         Plot plot = data.get(i);
                         plot.setGeometry();
                         tv.append("gid - " + plot.getGid() + " survey-no - " + plot.getSurvey_no() + "\n");
-                        if (plot.getGeometry() != null) {
-                            tv.append("not null\n\n");
-
-                            // Add polygon to map
-                            addPolygonToMap(plot.getGeometry());
-                        } else {
-                            tv.append("nullly \n\n");
-                        }
+                        addPolygonToMap(plot.getGeometry());
                     }
                     moveCameraToPlots(data);
                 } else {
@@ -124,9 +120,9 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         googleMap = map;
         map.getUiSettings().setZoomControlsEnabled(true);
         // Add a marker in the center of the map and move the camera
-        LatLng markerPosition = new LatLng(0, 0); // Change the coordinates as needed
-        googleMap.addMarker(new MarkerOptions().position(markerPosition).title("Marker"));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLng(markerPosition));
+//        LatLng markerPosition = new LatLng(0, 0); // Change the coordinates as needed
+//        googleMap.addMarker(new MarkerOptions().position(markerPosition).title("Marker"));
+//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(markerPosition));
     }
 
     // Add polygon to map
