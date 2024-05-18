@@ -25,6 +25,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
@@ -96,7 +97,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                             tv.append("nullly \n\n");
                         }
                     }
-                    //moveCameraToPlots(data);
+                    moveCameraToPlots(data);
                 } else {
                     // Handle unsuccessful response
                     Log.e("Retrofit", "Response not successful: " + response.message());
@@ -121,7 +122,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
         googleMap = map;
-
+        map.getUiSettings().setZoomControlsEnabled(true);
         // Add a marker in the center of the map and move the camera
         LatLng markerPosition = new LatLng(0, 0); // Change the coordinates as needed
         googleMap.addMarker(new MarkerOptions().position(markerPosition).title("Marker"));
@@ -157,26 +158,26 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         return polygonOptions;
     }
 
-//    private void moveCameraToPlots(List<Plot> plotsList) {
-//        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
-//
-//        for (Plot plot : plotsList) {
-//            if (plot.getGeometry() != null) {
-//                // Iterate through the coordinates of the plot and include them in the bounds
-//                for (LatLng latLng : plot.getGeometry().getCoordinates()) {
-//                    boundsBuilder.include(latLng);
-//                }
-//            }
-//        }
-//
-//        // Build the bounds
-//        LatLngBounds bounds = boundsBuilder.build();
-//
-//        // Set padding around the bounds (optional)
-//        int padding = 100; // Padding in pixels
-//        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-//
-//        // Move the camera to focus on the bounds
-//        googleMap.animateCamera(cameraUpdate);
-//    }
+    private void moveCameraToPlots(List<Plot> plotsList) {
+        LatLngBounds.Builder boundsBuilder = new LatLngBounds.Builder();
+
+        for (Plot plot : plotsList) {
+            if (plot.getGeometry() != null) {
+                // Iterate through the coordinates of the plot and include them in the bounds
+                for (Coordinate coordinate : plot.getGeometry().getCoordinates()) {
+                    boundsBuilder.include(new LatLng(coordinate.y, coordinate.x));
+                }
+            }
+        }
+
+        // Build the bounds
+        LatLngBounds bounds = boundsBuilder.build();
+
+        // Set padding around the bounds (optional)
+        int padding = 100; // Padding in pixels
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+        // Move the camera to focus on the bounds
+        googleMap.animateCamera(cameraUpdate);
+    }
 }
