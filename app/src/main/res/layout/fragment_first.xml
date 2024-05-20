@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <TextView
+    <EditText
         android:id="@+id/village_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -16,6 +16,13 @@
         android:text="Village name"
         android:textSize="25dp"
         android:padding="5dp"
+        android:layout_gravity="center" />
+
+    <Button
+        android:id="@+id/submit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit Village"
         android:layout_gravity="center" />
 
     <fragment
