@@ -44,7 +44,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     TextView tv;
     TextView village_name;
-    String url = "https://www.jsonkeeper.com/";
+    String url = "http://10.0.2.2:8000/";
 
     @Override
     public View onCreateView(
