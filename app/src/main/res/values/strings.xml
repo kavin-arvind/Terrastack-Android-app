@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">App1</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">Village maps</string>
+    <string name="second_fragment_label">Dummy</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="lorem_ipsum">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
+        volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
+    </string>
+    <string name="api_key">insert your google API</string>
+</resources>
