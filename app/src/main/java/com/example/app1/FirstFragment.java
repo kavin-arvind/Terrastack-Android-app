@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -45,7 +46,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     TextView tv;
     TextView village_name;
     String url = "http://10.0.2.2:8000/";
-
+    Button submit_village;
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -66,44 +67,52 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         // Obtain a reference to the SupportMapFragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
-
         tv = (TextView) view.findViewById(R.id.tv);
         village_name = (TextView) view.findViewById(R.id.village_name);
-        tv.setText("");
+        submit_village = view.findViewById(R.id.submit_village);
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        my_api api = retrofit.create(my_api.class);
-
-        Call<List<Plot>> call = api.getVillage();
-
-        call.enqueue(new Callback<List<Plot>>() {
+        submit_village.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResponse(Call<List<Plot>> call, Response<List<Plot>> response) {
-                if (response.isSuccessful()) {
-                    // Response is successful
-                    List<Plot> data = response.body();
-                    village_name.setText("Dagdagad");
-                    for (int i = 0; i < data.size(); i++) {
-                        Plot plot = data.get(i);
-                        plot.setGeometry();
-                        tv.append("gid - " + plot.getGid() + " survey-no - " + plot.getSurvey_no() + "\n");
-                        addPolygonToMap(plot.getGeometry());
+            public void onClick(View v) {
+                tv.setText("");
+                String village_name_str = village_name.getText().toString();
+
+                Retrofit retrofit = new Retrofit.Builder()
+                        .baseUrl(url)
+                        .addConverterFactory(GsonConverterFactory.create())
+                        .build();
+
+                my_api api = retrofit.create(my_api.class);
+
+                Call<List<Plot>> call = api.getVillage(village_name_str);
+
+                call.enqueue(new Callback<List<Plot>>() {
+                    @Override
+                    public void onResponse(Call<List<Plot>> call, Response<List<Plot>> response) {
+                        if (response.isSuccessful()) {
+                            // Response is successful
+                            List<Plot> data = response.body();
+                            village_name.setText(village_name_str);
+                            for (int i = 0; i < data.size(); i++) {
+                                Plot plot = data.get(i);
+                                plot.setGeometry();
+                                tv.append("gid - " + plot.getGid() + " survey-no - " + plot.getSurvey_no() + "\n");
+                                addPolygonToMap(plot.getGeometry());
+                            }
+                            moveCameraToPlots(data);
+                        } else {
+                            // Handle unsuccessful response
+                            Log.e("Retrofit", "Response not successful: " + response.message());
+                        }
                     }
-                    moveCameraToPlots(data);
-                } else {
-                    // Handle unsuccessful response
-                    Log.e("Retrofit", "Response not successful: " + response.message());
-                }
-            }
 
-            @Override
-            public void onFailure(Call<List<Plot>> call, Throwable t) {
-                // Handle failure
-                Log.e("Retrofit", "Failed to fetch data: " + t.getMessage());
+                    @Override
+                    public void onFailure(Call<List<Plot>> call, Throwable t) {
+                        // Handle failure
+                        Log.e("Retrofit", "Failed to fetch data: " + t.getMessage());
+                    }
+                });
+
             }
         });
 
