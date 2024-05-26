@@ -23,6 +23,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
@@ -74,6 +75,11 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         submit_village.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                // Clear the map before adding new polygons
+                if (googleMap != null) {
+                    googleMap.clear();
+                }
                 tv.setText("");
                 String village_name_str = village_name.getText().toString();
 
@@ -97,7 +103,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                                 Plot plot = data.get(i);
                                 plot.setGeometry();
                                 tv.append("gid - " + plot.getGid() + " survey-no - " + plot.getSurvey_no() + "\n");
-                                addPolygonToMap(plot.getGeometry());
+                                addPolygonToMap(plot);
                             }
                             moveCameraToPlots(data);
                         } else {
@@ -135,13 +141,34 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     }
 
     // Add polygon to map
-    private void addPolygonToMap(Geometry geometry) {
+    private void addPolygonToMap(Plot plot) {
         try {
+            Geometry geometry = plot.getGeometry();
             // Convert JTS Geometry to Google Maps PolygonOptions
             PolygonOptions polygonOptions = convertGeometryToPolygonOptions(geometry);
 
             // Add Polygon to the map
             googleMap.addPolygon(polygonOptions);
+
+            // Calculate the centroid of the polygon
+            Coordinate centroid = geometry.getCentroid().getCoordinate();
+            LatLng centroidLatLng = new LatLng(centroid.y, centroid.x);
+
+            // Add a marker at the centroid with an info window
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(centroidLatLng)
+                    .title("Survey No: " + plot.getSurvey_no())
+                    .snippet("GID: " + plot.getGid());
+            googleMap.addMarker(markerOptions);
+
+            // Set an info window click listener to display additional info
+            googleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                @Override
+                public void onInfoWindowClick(Marker marker) {
+                    // Handle the click event if needed
+                }
+            });
+
         } catch (ParseException e) {
             e.printStackTrace();
         }

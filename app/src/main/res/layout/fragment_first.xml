@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         android:textColor="#A020F0"
         android:inputType="text"
-        android:text="Village name"
+        android:text="dagdagad"
         android:textSize="25dp"
         android:padding="5dp"
         android:layout_gravity="center" />
