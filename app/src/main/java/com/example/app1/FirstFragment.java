@@ -102,7 +102,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                             for (int i = 0; i < data.size(); i++) {
                                 Plot plot = data.get(i);
                                 plot.setGeometry();
-                                tv.append("gid - " + plot.getGid() + " survey-no - " + plot.getSurvey_no() + "\n");
+                                tv.append("gid - " + plot.getGid() + " survey-tag - " + plot.getSurvey_tag() + "\n");
                                 addPolygonToMap(plot);
                             }
                             moveCameraToPlots(data);
@@ -157,7 +157,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
             // Add a marker at the centroid with an info window
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(centroidLatLng)
-                    .title("Survey No: " + plot.getSurvey_no())
+                    .title("Survey Tag: " + plot.getSurvey_tag())
                     .snippet("GID: " + plot.getGid());
             googleMap.addMarker(markerOptions);
 
