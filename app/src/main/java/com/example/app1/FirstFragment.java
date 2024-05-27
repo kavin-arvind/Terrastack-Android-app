@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.example.app1.Plot;
+import com.example.app1.Constants;
 import com.example.app1.R;
 import com.example.app1.databinding.FragmentFirstBinding;
 import com.example.app1.my_api;
@@ -46,7 +47,6 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     TextView tv;
     TextView village_name;
-    String url = "http://10.0.2.2:8000/";
     Button submit_village;
     @Override
     public View onCreateView(
@@ -84,7 +84,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                 String village_name_str = village_name.getText().toString();
 
                 Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(url)
+                        .baseUrl(Constants.url)
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
 
@@ -146,6 +146,19 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
             Geometry geometry = plot.getGeometry();
             // Convert JTS Geometry to Google Maps PolygonOptions
             PolygonOptions polygonOptions = convertGeometryToPolygonOptions(geometry);
+
+            // checking for filled sub_division_no
+            String sub_div_no = plot.getSub_division_no();
+            if(sub_div_no == null){
+                polygonOptions.fillColor(Constants.red);
+                polygonOptions.strokeColor(Constants.stroke_color);
+                polygonOptions.strokeWidth(Constants.stroke_width);
+            }
+            else{
+                polygonOptions.fillColor(Constants.green);
+                polygonOptions.strokeColor(Constants.stroke_color);
+                polygonOptions.strokeWidth(Constants.stroke_width);
+            }
 
             // Add Polygon to the map
             googleMap.addPolygon(polygonOptions);

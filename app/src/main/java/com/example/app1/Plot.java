@@ -18,10 +18,12 @@ public class Plot {
     private float varp;
     @SerializedName("geom")
     private String geomstr;
+    @SerializedName("sub_division_no")
+    private String sub_division_no;
     private Geometry geometry;
 
     // Constructor
-    public Plot(int gid, String survey_tag, int survey_tag_gid, String description, float varp, String coordinatesJson) {
+    public Plot(int gid, String survey_tag, int survey_tag_gid, String description, float varp, String coordinatesJson, String sub_division_no) {
         this.gid = gid;
         this.survey_tag = survey_tag;
         this.survey_tag_gid = survey_tag_gid;
@@ -29,6 +31,7 @@ public class Plot {
         this.varp = varp;
         this.geomstr = coordinatesJson;
         this.geometry = parseCoordinates(coordinatesJson);
+        this.sub_division_no = sub_division_no;
     }
 
     // Method to parse coordinates JSON string into Geometry object
@@ -64,6 +67,10 @@ public class Plot {
     public String getGeomstr() {
         return geomstr;
     }
+    public String getSub_division_no() {
+        return sub_division_no;
+    }
+
     // Setters
     public void setGeometry() {
         this.geometry = parseCoordinates(this.geomstr);
@@ -79,5 +86,8 @@ public class Plot {
     }
     public void setVarp(float varp) {
         this.varp = varp;
+    }
+    public void setSub_division_no(String sub_division_no) {
+        this.sub_division_no = sub_division_no;
     }
 }
