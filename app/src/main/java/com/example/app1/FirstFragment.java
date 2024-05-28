@@ -77,7 +77,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
         autoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                tv.setText(adapterVillages.getItem(position).toString());
+                village_name.setText(adapterVillages.getItem(position).toString());
             }
         });
 
