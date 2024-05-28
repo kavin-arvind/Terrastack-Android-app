@@ -24,14 +24,15 @@
 
     <TextView
         android:id="@+id/village_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:textColor="#A020F0"
         android:inputType="text"
-        android:text="dagdagad"
+        android:text=""
         android:textSize="25dp"
         android:padding="5dp"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        tools:visibility="invisible"/>
 
     <Button
         android:id="@+id/submit_village"
