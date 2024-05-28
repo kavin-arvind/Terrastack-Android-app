@@ -5,6 +5,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -48,6 +51,8 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     TextView tv;
     TextView village_name;
     Button submit_village;
+    AutoCompleteTextView autoComplete;
+    ArrayAdapter<String> adapterVillages;
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -64,6 +69,17 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                 NavHostFragment.findNavController(FirstFragment.this)
                         .navigate(R.id.action_FirstFragment_to_SecondFragment)
         );
+
+        // Drop down menu
+        autoComplete = view.findViewById(R.id.auto_complete_txt);
+        adapterVillages = new ArrayAdapter<String>(view.getContext(), R.layout.list_village, Constants.village_list);
+        autoComplete.setAdapter(adapterVillages);
+        autoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                tv.setText(adapterVillages.getItem(position).toString());
+            }
+        });
 
         // Obtain a reference to the SupportMapFragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
@@ -179,6 +195,7 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                 @Override
                 public void onInfoWindowClick(Marker marker) {
                     // Handle the click event if needed
+                    tv.setText(marker.getTitle() + "clicked\n");
                 }
             });
 

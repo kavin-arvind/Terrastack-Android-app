@@ -6,4 +6,5 @@ public class Constants {
     public static int green = 0xFF00FF00;
     public static int stroke_color = 0xFF000000;
     public static int stroke_width = 2;
+    public static String[] village_list = {"dagdagad", "deolanabk", "deolanakh"};
 }
