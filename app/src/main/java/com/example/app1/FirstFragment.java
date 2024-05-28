@@ -187,13 +187,23 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                 Plot plot1 = (Plot) marker1.getTag();
                 if (plot1 != null) {
                     try{
-                        String plot_info = getString(R.string.plot_info,
-                                plot1.getGid(),
-                                plot1.getSurvey_tag(),
-                                plot1.getSurvey_tag_gid(),
-                                plot1.getDescription(),
-                                plot1.getVarp(),
-                                plot1.getSub_division_no());
+                        String plot_info = "";
+                        if(plot1.getSurvey_tag() == null){
+                            plot_info = getString(R.string.plot_info_null,
+                                    plot1.getGid(),
+                                    plot1.getDescription(),
+                                    plot1.getVarp(),
+                                    plot1.getSub_division_no());
+                        }
+                        else{
+                            plot_info = getString(R.string.plot_info_not_null,
+                                    plot1.getGid(),
+                                    plot1.getSurvey_tag(),
+                                    plot1.getSurvey_tag_gid(),
+                                    plot1.getDescription(),
+                                    plot1.getVarp(),
+                                    plot1.getSub_division_no());
+                        }
                         tv.setText(plot_info);
                     }
                     catch (Error e){
