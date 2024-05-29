@@ -7,19 +7,35 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <EditText
-        android:id="@+id/village_name"
-        android:layout_width="wrap_content"
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:hint="@string/select_village"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        >
+        <AutoCompleteTextView
+            android:id="@+id/auto_complete_txt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <TextView
+        android:id="@+id/village_name"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:textColor="#A020F0"
         android:inputType="text"
-        android:text="Village name"
+        android:text=""
         android:textSize="25dp"
         android:padding="5dp"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+        tools:visibility="invisible"/>
 
     <Button
-        android:id="@+id/submit_button"
+        android:id="@+id/submit_village"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Submit Village"
@@ -45,7 +61,7 @@
                 android:textColor="#000000"
                 android:textSize="24sp"
                 android:id="@+id/tv"
-                android:text="Demo text"/>
+                android:text=""/>
         </ScrollView>
     
     <Button

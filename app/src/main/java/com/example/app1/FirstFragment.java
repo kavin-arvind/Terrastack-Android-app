@@ -5,16 +5,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.example.app1.Plot;
-import com.example.app1.R;
 import com.example.app1.databinding.FragmentFirstBinding;
-import com.example.app1.my_api;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -22,13 +22,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.ParseException;
-import org.locationtech.jts.io.WKTReader;
 
 import java.util.List;
 
@@ -44,8 +44,9 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap googleMap;
     TextView tv;
     TextView village_name;
-    String url = "http://10.0.2.2:8000/";
-
+    Button submit_village;
+    AutoCompleteTextView autoComplete;
+    ArrayAdapter<String> adapterVillages;
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
@@ -63,48 +64,68 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
                         .navigate(R.id.action_FirstFragment_to_SecondFragment)
         );
 
+        // Drop down menu
+        autoComplete = view.findViewById(R.id.auto_complete_txt);
+        adapterVillages = new ArrayAdapter<>(view.getContext(), R.layout.list_village, Constants.village_list);
+        autoComplete.setAdapter(adapterVillages);
+        autoComplete.setOnItemClickListener((parent, view1, position, id) -> village_name.setText(adapterVillages.getItem(position)));
+
         // Obtain a reference to the SupportMapFragment
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
+        tv = view.findViewById(R.id.tv);
+        village_name = view.findViewById(R.id.village_name);
+        submit_village = view.findViewById(R.id.submit_village);
 
-        tv = (TextView) view.findViewById(R.id.tv);
-        village_name = (TextView) view.findViewById(R.id.village_name);
-        tv.setText("");
+        submit_village.setOnClickListener(v -> {
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(url)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
+            // Clear the map before adding new polygons
+            if (googleMap != null) {
+                googleMap.clear();
+            }
+            tv.setText("");
+            String village_name_str = village_name.getText().toString();
 
-        my_api api = retrofit.create(my_api.class);
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(Constants.url)
+                    .addConverterFactory(GsonConverterFactory.create())
+                    .build();
 
-        Call<List<Plot>> call = api.getVillage();
+            my_api api = retrofit.create(my_api.class);
 
-        call.enqueue(new Callback<List<Plot>>() {
-            @Override
-            public void onResponse(Call<List<Plot>> call, Response<List<Plot>> response) {
-                if (response.isSuccessful()) {
-                    // Response is successful
-                    List<Plot> data = response.body();
-                    village_name.setText("Dagdagad");
-                    for (int i = 0; i < data.size(); i++) {
-                        Plot plot = data.get(i);
-                        plot.setGeometry();
-                        tv.append("gid - " + plot.getGid() + " survey-no - " + plot.getSurvey_no() + "\n");
-                        addPolygonToMap(plot.getGeometry());
+            Call<List<Plot>> call = api.getVillage(village_name_str);
+
+            call.enqueue(new Callback<List<Plot>>() {
+                @Override
+                public void onResponse(@NonNull Call<List<Plot>> call, @NonNull Response<List<Plot>> response) {
+                    if (response.isSuccessful()) {
+                        // Response is successful
+                        List<Plot> data = response.body();
+                        village_name.setText(village_name_str);
+                        if (data != null) {
+                            for (int i = 0; i < data.size(); i++) {
+                                Plot plot = data.get(i);
+                                plot.setGeometry();
+                                // tv.append("gid - " + plot.getGid() + " survey-tag - " + plot.getSurvey_tag() + "\n");
+                                addPolygonToMap(plot);
+                            }
+                            moveCameraToPlots(data);
+                        }
+                    } else {
+                        // Handle unsuccessful response
+                        Log.e("Retrofit", "Response not successful: " + response.message());
                     }
-                    moveCameraToPlots(data);
-                } else {
-                    // Handle unsuccessful response
-                    Log.e("Retrofit", "Response not successful: " + response.message());
                 }
-            }
 
-            @Override
-            public void onFailure(Call<List<Plot>> call, Throwable t) {
-                // Handle failure
-                Log.e("Retrofit", "Failed to fetch data: " + t.getMessage());
-            }
+                @Override
+                public void onFailure(@NonNull Call<List<Plot>> call, @NonNull Throwable t) {
+                    // Handle failure
+                    Log.e("Retrofit", "Failed to fetch data: " + t.getMessage());
+                }
+            });
+
         });
 
     }
@@ -126,13 +147,74 @@ public class FirstFragment extends Fragment implements OnMapReadyCallback {
     }
 
     // Add polygon to map
-    private void addPolygonToMap(Geometry geometry) {
+    private void addPolygonToMap(Plot plot) {
         try {
+            Geometry geometry = plot.getGeometry();
             // Convert JTS Geometry to Google Maps PolygonOptions
             PolygonOptions polygonOptions = convertGeometryToPolygonOptions(geometry);
 
+            // checking for filled sub_division_no
+            String sub_div_no = plot.getSub_division_no();
+            if(sub_div_no == null){
+                polygonOptions.fillColor(Constants.red);
+            }
+            else{
+                polygonOptions.fillColor(Constants.green);
+            }
+            polygonOptions.strokeColor(Constants.stroke_color);
+            polygonOptions.strokeWidth(Constants.stroke_width);
+
             // Add Polygon to the map
             googleMap.addPolygon(polygonOptions);
+
+            // Calculate the centroid of the polygon
+            Coordinate centroid = geometry.getCentroid().getCoordinate();
+            LatLng centroidLatLng = new LatLng(centroid.y, centroid.x);
+
+            // Add a marker at the centroid with an info window
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(centroidLatLng)
+                    .title("Survey Tag: " + plot.getSurvey_tag())
+                    .snippet("GID: " + plot.getGid());
+            Marker marker = googleMap.addMarker(markerOptions);
+            if (marker != null) {
+                marker.setTag(plot);
+            }
+
+            // Set an info window click listener to display additional info
+            googleMap.setOnInfoWindowClickListener(marker1 -> {
+                // Handle the click event if needed
+                Plot plot1 = (Plot) marker1.getTag();
+                if (plot1 != null) {
+                    try{
+                        String plot_info = "";
+                        if(plot1.getSurvey_tag() == null){
+                            plot_info = getString(R.string.plot_info_null,
+                                    plot1.getGid(),
+                                    plot1.getDescription(),
+                                    plot1.getVarp(),
+                                    plot1.getSub_division_no());
+                        }
+                        else{
+                            plot_info = getString(R.string.plot_info_not_null,
+                                    plot1.getGid(),
+                                    plot1.getSurvey_tag(),
+                                    plot1.getSurvey_tag_gid(),
+                                    plot1.getDescription(),
+                                    plot1.getVarp(),
+                                    plot1.getSub_division_no());
+                        }
+                        tv.setText(plot_info);
+                    }
+                    catch (Error e){
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    tv.setText("Try Again.. Returned null value..\n");
+                }
+            });
+
         } catch (ParseException e) {
             e.printStackTrace();
         }
