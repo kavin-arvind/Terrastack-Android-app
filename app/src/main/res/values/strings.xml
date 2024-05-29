@@ -27,5 +27,5 @@
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
     </string>
-    <string name="api_key">AIzaSyDr9hw61wzG1fqw5o5Rzv9u3evjqecHjbE</string>
+    <string name="api_key">insert your google API</string>
 </resources>
