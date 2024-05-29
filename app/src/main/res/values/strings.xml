@@ -6,10 +6,26 @@
     <string name="second_fragment_label">Dummy</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
+    <string name="select_village">Select Village</string>
+    <string name="plot_info_not_null">
+        Gid - %1$d\n
+        Survey-tag - %2$s\n
+        Survey-tag-gid - %3$d\n
+        Description - %4$s\n
+        Varp - %5$f\n
+        Sub-Division number - %6$s\n
+    </string>
+    <string name="plot_info_null">
+        Gid - %1$d\n
+        Survey-tag - N/A\n
+        Survey-tag-gid - N/A\n
+        Description - %2$s\n
+        Varp - %3$f\n
+        Sub-Division number - %4$s\n
+    </string>
     <string name="lorem_ipsum">
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam in scelerisque sem. Mauris
         volutpat, dolor id interdum ullamcorper, risus dolor egestas lectus, sit amet mattis purus
     </string>
-    <string name="api_key">insert your google API</string>
+    <string name="api_key">AIzaSyDr9hw61wzG1fqw5o5Rzv9u3evjqecHjbE</string>
 </resources>
